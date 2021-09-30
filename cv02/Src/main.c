@@ -67,9 +67,17 @@ void tlacitka(void)
 
 	if (Tick > delay_s2 + DEBOUNCE){
 
+<<<<<<< HEAD
 
 		debounce <<=1;
 
+=======
+	if (Tick > delay_s2 + DEBOUNCE){
+
+
+		debounce <<=1;
+
+>>>>>>> b3f7e0c674e021929024aa1deb010b897033cfdc
 		if (GPIOC->IDR & (1<<0)){
 			debounce |= 0x0001;
 		}
@@ -94,6 +102,15 @@ void tlacitka(void)
 
 		delay_s1 = Tick;
 	}
+<<<<<<< HEAD
+=======
+
+	if (Tick > off_time) {
+		GPIOB->BRR = (1<<0);
+	}
+
+}
+>>>>>>> b3f7e0c674e021929024aa1deb010b897033cfdc
 
 	if (Tick > off_time) {
 		GPIOB->BRR = (1<<0);
