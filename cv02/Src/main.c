@@ -24,6 +24,7 @@
 #define  LED_TIME_SHORT 100
 #define  LED_TIME_LONG  1000
 #define	 CYCLE			40
+#define  DEBOUNCE       5
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
@@ -57,28 +58,25 @@ void blikac(void)
 
 void tlacitka(void)
 {
-	static uint32_t old_s2;
+
 	static uint32_t old_s1;
-	static uint32_t off_time_s2;
-	static uint32_t off_time_s1;
+	static uint32_t off_time;
 	static uint32_t delay_s2;
 	static uint32_t delay_s1;
-	static uint32_t sos = 0;
+	static uint16_t debounce = 0xFFFF;
+
+	if (Tick > delay_s2 + DEBOUNCE){
 
 
-	if (Tick > delay_s2 + CYCLE){
+		debounce <<=1;
 
-		uint32_t new_s2 = GPIOC->IDR & (1<<0);  // read but 2
-
-		if (old_s2 && !new_s2) { // falling edge
-			off_time_s2 = Tick + LED_TIME_SHORT;
-			GPIOB->BSRR = (1<<0);
+		if (GPIOC->IDR & (1<<0)){
+			debounce |= 0x0001;
 		}
-		old_s2 = new_s2;
 
-
-		if (Tick > off_time_s2 && sos ==1) {
-			GPIOB->BRR = (1<<0);
+		if (debounce == 0x7FFF){
+			off_time = Tick + LED_TIME_SHORT;
+			GPIOB->BSRR = (1<<0);
 		}
 
 		delay_s2 = Tick;
@@ -89,28 +87,22 @@ void tlacitka(void)
 		uint32_t new_s1 = GPIOC->IDR & (1<<1);  // read but 1
 
 		if (old_s1 && !new_s1) { // falling edge
-			off_time_s1 = Tick + LED_TIME_LONG;
+			off_time = Tick + LED_TIME_LONG;
 			GPIOB->BSRR = (1<<0);
-			sos = 0;
 		}
 		old_s1 = new_s1;
 
-
-		if (Tick > off_time_s1) {
-			GPIOB->BRR = (1<<0);
-			sos =1;
-		}
-
 		delay_s1 = Tick;
 	}
+
+	if (Tick > off_time) {
+		GPIOB->BRR = (1<<0);
+	}
+
 }
-
-
 
 int main(void)
 {
-
-
 
 	RCC->AHBENR |= RCC_AHBENR_GPIOAEN | RCC_AHBENR_GPIOBEN | RCC_AHBENR_GPIOCEN; // enable
 	GPIOA->MODER |= GPIO_MODER_MODER4_0; // LED1 = PA4, output
