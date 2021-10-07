@@ -6,7 +6,6 @@
  */
 
 #include <stdint.h>
-#include "stm32f0xx.h"
 #include "sct.h"
 #include "main.h"
 
