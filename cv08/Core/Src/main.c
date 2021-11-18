@@ -119,7 +119,7 @@ int main(void)
 		  }
 		  timer = HAL_GetTick();
 		  printf("Stisknuto: %d \n", key);
-		  HAL_Delay(2250);
+		  HAL_Delay(250);
 
 		  // Porovnání
 		  if (key == zamek[index]){
